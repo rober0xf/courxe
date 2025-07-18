@@ -13,5 +13,6 @@
   "reportMissingImports": true,
   "reportMissingTypeStubs": false,
   "pythonVersion": "3.13",
-  "typeCheckingMode": "basic"
+  "autoImportCompletions": false,
+  "typeCheckingMode": "standard"
 }
