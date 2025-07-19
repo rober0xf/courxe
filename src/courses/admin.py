@@ -13,13 +13,13 @@ class LessonInline(admin.StackedInline):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    inline = [LessonInline]
+    inlines = [LessonInline]
     list_display = ["title", "status", "access"]
     list_filter = ["access", "status"]
     fields = ["title", "description", "access", "status", "image", "display_image", "public_id"]
     readonly_fields = ["public_id", "display_image"]  # we need to create display image here because its not a field of the course model
 
-    def display_image(self, object, *args, **kwargs):
+    def display_image(self, obj, *args, **kwargs):
         # object its the instance of the course
-        url = object.image_admin
+        url = obj.image_admin
         return format_html("<img src='{}' />", url)

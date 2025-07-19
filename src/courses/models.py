@@ -44,8 +44,8 @@ class Course(models.Model):
     status = models.CharField(max_length=11, choices=PublishStatus.choices, default=PublishStatus.DRAFT)
 
     def save(self, *args, **kargs):
-        if self.public_id == "" and self.public_id is None:
-            self.public_id = id_utils.generate_public_id(self.title)
+        if self.public_id == "" or self.public_id is None:
+            self.public_id = id_utils.generate_public_id(self)  # self.title would be wrong
         super().save(*args, **kargs)
 
     @property

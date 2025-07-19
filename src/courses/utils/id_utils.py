@@ -15,11 +15,17 @@ def generate_public_id(instance, *args, **kargs):
 
 # for the image url field
 def get_public_id_prefix(instance, *args, **kargs):
-    title = instance.title
-    if title:
-        slug = slugify(title)
-        unique_id = str(uuid4()).replace("-", "")[:5]
-        return f"courses/{slug}-{unique_id}-"  # url will be like www.yari/courses-id-yara
-    if instance.id:
-        return f"courses/{instance.id}"
-    return "courses"
+    if hasattr(instance, "path"):
+        path = instance.path
+        if path.startswith("/"):
+            path = path[1:]
+        if path.endswith("/"):
+            path = path[:-1]
+        return path
+    public_id = instance.public_id
+    model_class = instance.__class__
+    model_name = model_class.__name__
+    model_slug = slugify(model_name)
+    if not public_id:
+        return f"{model_slug}"
+    return f"{model_slug}/{public_id}"
