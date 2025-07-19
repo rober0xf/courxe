@@ -45,3 +45,11 @@ class Course(models.Model):
             return url
         except Exception:
             return ""
+
+
+class Lesson(models.Model):
+    related_course = models.ForeignKey(Course, on_delete=models.CASCADE)  # linking the lesson with a course
+    title = models.CharField(max_length=20)
+    description = models.TextField(blank=True, null=True)
+    can_preview = models.BooleanField(default=False, help_text="if the user doesnt have access to the course, can he see this?")  # type: ignore
+    status = models.CharField(max_length=11, choices=PublishStatus.choices, default=PublishStatus.PUBLISHED)
