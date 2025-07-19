@@ -1,3 +1,4 @@
+from cloudinary import CloudinaryImage
 from cloudinary.models import CloudinaryField
 from django.db import models
 
@@ -26,7 +27,6 @@ class PublishStatus(models.TextChoices):
 class Course(models.Model):
     title = models.CharField(max_length=20)
     description = models.TextField(blank=True, null=True)
-    # image = models.ImageField(upload_to=handle_upload, blank=True, null=True)
     image = CloudinaryField("image", null=True)
     access = models.CharField(max_length=14, choices=AcessRequirements.choices, default=AcessRequirements.ANYONE)
     status = models.CharField(max_length=11, choices=PublishStatus.choices, default=PublishStatus.DRAFT)
@@ -34,3 +34,14 @@ class Course(models.Model):
     @property
     def is_published(self):
         return self.status == PublishStatus.PUBLISHED
+
+    @property
+    def image_admin(self):
+        if not self.image:
+            return ""
+        image_options = {"width": 500}
+        try:
+            url = CloudinaryImage(str(self.image)).build_url(**image_options)
+            return url
+        except Exception:
+            return ""
