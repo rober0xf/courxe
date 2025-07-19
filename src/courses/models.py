@@ -1,3 +1,5 @@
+from typing import cast
+
 from cloudinary import CloudinaryImage
 from cloudinary.models import CloudinaryField
 from django.db import models
@@ -48,6 +50,9 @@ class Course(models.Model):
             self.public_id = id_utils.generate_public_id(self)  # self.title would be wrong
         super().save(*args, **kargs)
 
+    def get_display_name(self):
+        return f"{self.title}"
+
     @property
     def is_published(self):
         return self.status == PublishStatus.PUBLISHED
@@ -63,11 +68,18 @@ class Course(models.Model):
         except Exception:
             return ""
 
+    @property
+    def path(self):
+        if not self.public_id:
+            raise ValueError("public_id is not set")
+        return f"/courses/{self.public_id}/"
+
 
 class Lesson(models.Model):
     related_course = models.ForeignKey(Course, on_delete=models.CASCADE)  # linking the lesson with a course
     title = models.CharField(max_length=20)
     description = models.TextField(blank=True, null=True)
+    public_id = models.CharField(max_length=120, blank=True, null=True)  # slug
     can_preview = models.BooleanField(default=False, help_text="if the user doesnt have access to the course, can he see this?")  # type: ignore
     status = models.CharField(max_length=11, choices=PublishStatus.choices, default=PublishStatus.PUBLISHED)
     thumbnail = CloudinaryField("image", blank=True, null=True)
@@ -79,3 +91,29 @@ class Lesson(models.Model):
     # feature: order of the lessons
     class Meta:
         ordering = ["order", "-updated"]  # order by most recent change
+
+    def save(self, *args, **kargs):
+        if self.public_id == "" or self.public_id is None:
+            self.public_id = id_utils.generate_public_id(self)
+        super().save(*args, **kargs)
+
+    def get_display_name(self):
+        if not self.related_course or not hasattr(self.related_course, "get_display_name"):
+            raise ValueError("related_course or its get_display_name is not set")
+
+        course = cast(Course, self.related_course)  # for lsp reason
+        return f"{self.title}-{course.get_display_name()}"
+
+    @property
+    def path(self):
+        if not self.related_course or not hasattr(self.related_course, "path"):
+            raise ValueError("related_course or its path is not set")
+        if not self.public_id:
+            raise ValueError("public_id is not set")
+
+        course = cast(Course, self.related_course)  # for lsp reason
+        course_path = str(course.path)
+        if course_path.endswith("/"):
+            course_path = course_path[:-1]
+
+        return f"{course_path}/lessons/{self.public_id}"
