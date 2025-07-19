@@ -31,6 +31,7 @@ media
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
+cdn/
 
 # Gradle
 .idea/**/gradle.xml

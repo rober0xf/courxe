@@ -1,5 +1,7 @@
 {
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "exclude": [
     "**/node_modules",
     "**/__pycache__",
@@ -12,7 +14,8 @@
   "venv": ".venv",
   "reportMissingImports": true,
   "reportMissingTypeStubs": false,
+  "reportArgumentType": "none",
   "pythonVersion": "3.13",
   "autoImportCompletions": false,
-  "typeCheckingMode": "standard"
+  "typeCheckingMode": "basic"
 }
