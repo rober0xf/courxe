@@ -16,8 +16,8 @@ class CourseAdmin(admin.ModelAdmin):
     inline = [LessonInline]
     list_display = ["title", "status", "access"]
     list_filter = ["access", "status"]
-    readonly_fields = ["display_image"]  # we need to create display image here because its not a field of the course model
-    fields = ["title", "description", "access", "status", "image", "display_image"]
+    fields = ["title", "description", "access", "status", "image", "display_image", "public_id"]
+    readonly_fields = ["public_id", "display_image"]  # we need to create display image here because its not a field of the course model
 
     def display_image(self, object, *args, **kwargs):
         # object its the instance of the course

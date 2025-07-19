@@ -5,12 +5,16 @@ from django.utils import timezone
 
 import helpers
 
+from .utils import id_utils, image_utils
+from .utils.image_utils import handle_upload as real_handle_upload
+
 # init the image processor
 helpers.clodinary_init()
 
 
-def handle_upload(instance: str, filename):
-    return f"filename: {filename}"
+# we need to define here so django dont complain, real_handle_upload has the correct logic
+def handle_upload(instance, filename):
+    return real_handle_upload(instance, filename)
 
 
 class AcessRequirements(models.TextChoices):
@@ -26,11 +30,23 @@ class PublishStatus(models.TextChoices):
 
 
 class Course(models.Model):
-    title = models.CharField(max_length=20)
+    title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    image = CloudinaryField("image", null=True)
+    public_id = models.CharField(max_length=120, blank=True, null=True)  # slug
+    image = CloudinaryField(  # better to use cloudinaryfield than imagefield
+        "image",
+        null=True,
+        public_id_prefix=id_utils.get_public_id_prefix,
+        display_name=image_utils.get_display_name,
+        tags=["course", "thumbnail"],
+    )
     access = models.CharField(max_length=14, choices=AcessRequirements.choices, default=AcessRequirements.ANYONE)
     status = models.CharField(max_length=11, choices=PublishStatus.choices, default=PublishStatus.DRAFT)
+
+    def save(self, *args, **kargs):
+        if self.public_id == "" and self.public_id is None:
+            self.public_id = id_utils.generate_public_id(self.title)
+        super().save(*args, **kargs)
 
     @property
     def is_published(self):
@@ -57,7 +73,7 @@ class Lesson(models.Model):
     thumbnail = CloudinaryField("image", blank=True, null=True)
     video = CloudinaryField("video", blank=True, null=True, resource_type="video")  # we need the resource type
     order = models.IntegerField(default=0)  # to be able to change the lessons order
-    timestamp = models.DateTimeField(auto_now_add=True, default=timezone.now())
+    timestamp = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(auto_now=True)
 
     # feature: order of the lessons
