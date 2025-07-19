@@ -1,6 +1,7 @@
 from cloudinary import CloudinaryImage
 from cloudinary.models import CloudinaryField
 from django.db import models
+from django.utils import timezone
 
 import helpers
 
@@ -53,3 +54,12 @@ class Lesson(models.Model):
     description = models.TextField(blank=True, null=True)
     can_preview = models.BooleanField(default=False, help_text="if the user doesnt have access to the course, can he see this?")  # type: ignore
     status = models.CharField(max_length=11, choices=PublishStatus.choices, default=PublishStatus.PUBLISHED)
+    thumbnail = CloudinaryField("image", blank=True, null=True)
+    video = CloudinaryField("video", blank=True, null=True, resource_type="video")  # we need the resource type
+    order = models.IntegerField(default=0)  # to be able to change the lessons order
+    timestamp = models.DateTimeField(auto_now_add=True, default=timezone.now())
+    updated = models.DateTimeField(auto_now=True)
+
+    # feature: order of the lessons
+    class Meta:
+        ordering = ["order", "-updated"]  # order by most recent change
