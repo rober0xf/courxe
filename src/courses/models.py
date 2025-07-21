@@ -1,6 +1,5 @@
 from typing import cast
 
-from cloudinary import CloudinaryImage
 from cloudinary.models import CloudinaryField
 from django.db import models
 from django.utils import timezone
@@ -11,7 +10,7 @@ from .utils import id_utils, image_utils
 from .utils.image_utils import handle_upload as real_handle_upload
 
 # init the image processor
-helpers.clodinary_init()
+helpers.cloudinary_init()
 
 
 # we need to define here so django dont complain, real_handle_upload has the correct logic
@@ -58,17 +57,6 @@ class Course(models.Model):
         return self.status == PublishStatus.PUBLISHED
 
     @property
-    def image_admin(self):
-        if not self.image:
-            return ""
-        image_options = {"width": 500}
-        try:
-            url = CloudinaryImage(str(self.image)).build_url(**image_options)
-            return url
-        except Exception:
-            return ""
-
-    @property
     def path(self):
         if not self.public_id:
             raise ValueError("public_id is not set")
@@ -82,8 +70,22 @@ class Lesson(models.Model):
     public_id = models.CharField(max_length=120, blank=True, null=True)  # slug
     can_preview = models.BooleanField(default=False, help_text="if the user doesnt have access to the course, can he see this?")  # type: ignore
     status = models.CharField(max_length=11, choices=PublishStatus.choices, default=PublishStatus.PUBLISHED)
-    thumbnail = CloudinaryField("image", blank=True, null=True)
-    video = CloudinaryField("video", blank=True, null=True, resource_type="video")  # we need the resource type
+    thumbnail = CloudinaryField(
+        "image",
+        public_id_prefix=id_utils.get_public_id_prefix,
+        display_name=image_utils.get_display_name,
+        blank=True,
+        null=True,
+    )
+    video = CloudinaryField(
+        "video",
+        public_id_prefix=id_utils.get_public_id_prefix,
+        display_name=image_utils.get_display_name,
+        blank=True,
+        null=True,
+        resource_type="video",
+        type="private",
+    )  # we need the resource type
     order = models.IntegerField(default=0)  # to be able to change the lessons order
     timestamp = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(auto_now=True)

@@ -6,7 +6,7 @@ CLOUDINARY_API_KEY = config("CLOUDINARY_API_KEY", default="")
 CLOUDINARY_SECRET_KEY = config("CLOUDINARY_SECRET_KEY")
 
 
-def clodinary_init():
+def cloudinary_init():
     cloudinary.config(
         cloud_name=CLOUDINARY_CLOUD_NAME,
         api_key=CLOUDINARY_API_KEY,

@@ -1,3 +1,7 @@
-from ._clodinary import clodinary_init
+from ._clodinary import cloudinary_init, get_cloudinary_image_object, get_cloudinary_video_object
 
-__all__ = ["clodinary_init"]
+__all__ = [
+    "cloudinary_init",
+    "get_cloudinary_image_object",
+    "get_cloudinary_video_object",
+]

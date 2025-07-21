@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
+import helpers
+
 from .models import Course, Lesson
 
 
@@ -8,7 +10,15 @@ from .models import Course, Lesson
 class LessonInline(admin.StackedInline):
     model = Lesson
     extra = 0  # to not show empty lessons
-    readonly_fields = ["updated"]  # so we can only see it
+    readonly_fields = ["public_id", "updated", "display_image"]  # so we can only see it
+
+    def display_image(self, obj, *args, **kwargs):
+        url = helpers.get_cloudinary_image_object(obj, field_name="thumbnail", width=200)
+        return format_html("<img src='{}' />", url)
+
+    def display_video(self, obj, *args, **kwargs):
+        url = helpers.get_cloudinary_image_object(obj, field_name="thumbnail", width=200)
+        return format_html("<img src='{}' />", url)
 
 
 @admin.register(Course)
