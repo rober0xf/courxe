@@ -1,9 +1,9 @@
 import cloudinary
-from decouple import config  # to load env files
+from django.conf import settings
 
-CLOUDINARY_CLOUD_NAME = config("CLOUDINARY_CLOUD_NAME", default="")
-CLOUDINARY_API_KEY = config("CLOUDINARY_API_KEY", default="")
-CLOUDINARY_SECRET_KEY = config("CLOUDINARY_SECRET_KEY")
+CLOUDINARY_CLOUD_NAME = settings.CLOUDINARY_CLOUD_NAME
+CLOUDINARY_API_KEY = settings.CLOUDINARY_API_KEY
+CLOUDINARY_SECRET_KEY = settings.CLOUDINARY_SECRET_KEY
 
 
 def cloudinary_init():

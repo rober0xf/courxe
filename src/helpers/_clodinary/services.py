@@ -1,4 +1,7 @@
-from cloudinary import CloudinaryImage, CloudinaryVideo
+from cloudinary.utils import cloudinary_url
+from django.template.loader import get_template
+
+from courxe import settings
 
 
 def set_sizes(obj, height=None, width=None):
@@ -7,10 +10,10 @@ def set_sizes(obj, height=None, width=None):
     if width is not None:
         obj["width"] = width
     if height and width:
-        obj["crop"] = "limit"
+        obj["crop"] = "fill"
 
 
-def get_cloudinary_image_object(instance, field_name="image", as_html=False, width=None):
+def get_cloudinary_image_object(instance, field_name="image", as_html=False, height=None, width=None):
     if not hasattr(instance, field_name):
         return ""
 
@@ -18,15 +21,24 @@ def get_cloudinary_image_object(instance, field_name="image", as_html=False, wid
     if not image_object:
         return ""
 
-    image_options = {}
-    set_sizes(obj=image_options, width=width)
+    image_options = {
+        "resource_type": "image",
+        "fetch_format": "auto",
+        "qualityt": "auto",
+    }
+    set_sizes(obj=image_options, height=height, width=width)
 
     try:
         if as_html:
-            return image_object.image(**image_options)
-        url = CloudinaryImage(str(image_object)).build_url(**image_options)
-        return url
-    except Exception:
+            url, options = cloudinary_url(str(image_object), **image_options)
+            img_attrs = f"width='{width}'" if width else ""
+            img_attrs += f"height='{height}'" if height else ""
+            return f"<img src='{url}' {img_attrs} alt='Image' style='max-width: 100%; height: auto;'>"
+        else:
+            url, _ = cloudinary_url(str(image_object), **image_options)
+            return url
+    except Exception as e:
+        print(f"error generating image: {e}")
         return ""
 
 
@@ -36,9 +48,10 @@ def get_cloudinary_video_object(
     as_html=False,
     width=None,
     height=None,
-    is_private=False,
     fetch_format="auto",
     quality="auto",
+    controls=True,
+    autoplay=False,
 ):
     if not hasattr(instance, field_name):
         return ""
@@ -48,16 +61,32 @@ def get_cloudinary_video_object(
         return ""
 
     video_options = {
-        "is_priv": is_private,
+        "resource_type": "video",
         "fetch_format": fetch_format,
         "quality": quality,
+        "type": "private",
+        "sign_url": True,
     }
+
     set_sizes(obj=video_options, height=height, width=width)
 
     try:
+        url, _ = cloudinary_url(str(video_object), **video_options)
         if as_html:
-            return video_object.video(**video_options)
-        url = CloudinaryVideo(str(video_object)).build_url(**video_options)
+            template = get_template("videos/snippets/video_embed.html")
+            html = template.render(
+                {
+                    "video_url": url,
+                    "cloudinary_name": settings.CLOUDINARY_CLOUD_NAME,
+                    "controls": controls,
+                    "autoplay": autoplay,
+                    "width": width,
+                    "height": height,
+                }
+            )
+            return html
+
         return url
-    except Exception:
+    except Exception as e:
+        print("error generating video: ", e)
         return ""
