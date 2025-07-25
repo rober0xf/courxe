@@ -84,7 +84,7 @@ class Lesson(models.Model):
         blank=True,
         null=True,
         resource_type="video",
-        type="private",
+        type="upload",
     )  # we need the resource type
     order = models.IntegerField(default=0)  # to be able to change the lessons order
     timestamp = models.DateTimeField(default=timezone.now)

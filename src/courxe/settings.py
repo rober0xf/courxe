@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from csp.constants import SELF
 from decouple import config  # to load env files
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,7 +31,18 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # my apps
     "courses",
+    "csp",
 ]
+
+# cloudinary videos
+CONTENT_SECURITY_POLICY = {
+    "EXCLUDE_URL_PREFIXES": ["/admin"],
+    "DIRECTIVES": {
+        "default-src": [SELF, "*.example.com"],
+        "script-src": [SELF, "js.cdn.com/example/"],
+        "img-src": [SELF, "data:", "example.com"],
+    },
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

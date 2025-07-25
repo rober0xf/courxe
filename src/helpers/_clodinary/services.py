@@ -46,8 +46,8 @@ def get_cloudinary_video_object(
     instance,
     field_name="video",
     as_html=False,
-    width=None,
     height=None,
+    width=None,
     fetch_format="auto",
     quality="auto",
     controls=True,
@@ -60,28 +60,42 @@ def get_cloudinary_video_object(
     if not video_object:
         return ""
 
+    # fallbacks
+    public_id = None
+    if hasattr(video_object, "public_id"):
+        public_id = video_object.public_id
+    elif str(video_object):
+        public_id = str(video_object)
+    elif hasattr(video_object, "url"):
+        url = video_object.url
+        if "upload/" in url:
+            public_id = url.split("upload/")[-1].split(".")[0]  # extract public id from url
+
+    if not public_id:
+        print("could not determine public_id")
+        return ""
+
     video_options = {
         "resource_type": "video",
         "fetch_format": fetch_format,
         "quality": quality,
-        "type": "private",
-        "sign_url": True,
     }
 
     set_sizes(obj=video_options, height=height, width=width)
 
     try:
-        url, _ = cloudinary_url(str(video_object), **video_options)
+        url, _ = cloudinary_url(public_id, **video_options)
         if as_html:
             template = get_template("videos/snippets/video_embed.html")
             html = template.render(
                 {
-                    "video_url": url,
-                    "cloudinary_name": settings.CLOUDINARY_CLOUD_NAME,
+                    "video_url": public_id,
+                    "cloud_name": settings.CLOUDINARY_CLOUD_NAME,
+                    "cloudinary_name": settings.CLOUDINARY_CLOUD_NAME,  # keep it just in case
                     "controls": controls,
                     "autoplay": autoplay,
-                    "width": width,
-                    "height": height,
+                    "height": height or 225,
+                    "width": width or 400,
                 }
             )
             return html
