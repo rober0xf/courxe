@@ -1,4 +1,5 @@
-<video controls width="{{ width|default:400 }}" height="{{ height|default:225 }}">
-    <source src="{{ video_url }}" type="video/mp4">
-    <p>Video not supported. <a href="{{ video_url }}">Direct link</a></p>
+<video id="demo-player" class="videos" width="100%" height="225" controls preload="metadata"
+    style="max-width: 100%; height: auto;" data-video-url="{{ video_url }}" data-cloud-name="{{ cloud_name }}">
+    <source src="https://res.cloudinary.com/{{ cloud_name }}/video/upload/{{ video_url }}.mp4" type="video/mp4">
+    Your browser does not support the video tag.
 </video>
