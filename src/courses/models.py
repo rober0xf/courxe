@@ -33,7 +33,7 @@ class PublishStatus(models.TextChoices):
 class Course(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    public_id = models.CharField(max_length=120, blank=True, null=True)  # slug
+    public_id = models.CharField(max_length=120, blank=True, null=True, db_index=True)  # slug
     image = CloudinaryField(  # better to use cloudinaryfield than imagefield
         "image",
         null=True,
@@ -52,6 +52,9 @@ class Course(models.Model):
     def get_display_name(self):
         return f"{self.title}"
 
+    def get_absolute_url(self):
+        return self.path
+
     @property
     def is_published(self):
         return self.status == PublishStatus.PUBLISHED
@@ -67,7 +70,7 @@ class Lesson(models.Model):
     related_course = models.ForeignKey(Course, on_delete=models.CASCADE)  # linking the lesson with a course
     title = models.CharField(max_length=20)
     description = models.TextField(blank=True, null=True)
-    public_id = models.CharField(max_length=120, blank=True, null=True)  # slug
+    public_id = models.CharField(max_length=120, blank=True, null=True, db_index=True)  # slug
     can_preview = models.BooleanField(default=False, help_text="if the user doesnt have access to the course, can he see this?")  # type: ignore
     status = models.CharField(max_length=11, choices=PublishStatus.choices, default=PublishStatus.PUBLISHED)
     thumbnail = CloudinaryField(
@@ -106,6 +109,9 @@ class Lesson(models.Model):
         course = cast(Course, self.related_course)  # for lsp reason
         return f"{self.title}-{course.get_display_name()}"
 
+    def get_absolute_url(self):
+        return self.path
+
     @property
     def path(self):
         if not self.related_course or not hasattr(self.related_course, "path"):
@@ -119,3 +125,11 @@ class Lesson(models.Model):
             course_path = course_path[:-1]
 
         return f"{course_path}/lessons/{self.public_id}"
+
+    @property
+    def is_coming_soon(self):
+        return self.status == PublishStatus.COMING_SOON
+
+    @property
+    def has_video(self):
+        return self.video is not None
