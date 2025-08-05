@@ -1,9 +1,15 @@
 {% extends "base.html" %}
 <h1>Hello</h1>
 {% block head_title %}
-Hello world from home page
+Courxe
 {% endblock head_title %}
 
 {% block content %}
-Hello body world from hom
+<div>
+    <form method="post" action=".">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">Login</button>
+    </form>
+</div>
 {% endblock content %}
