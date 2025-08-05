@@ -7,7 +7,7 @@ from .views import home
 
 urlpatterns = [
     path(route="admin/", view=admin.site.urls),
-    path(route="courses/", view=include("courses.url")),
+    path("courses/", include("courses.urls")),
     path(route="", view=home),
 ]
 

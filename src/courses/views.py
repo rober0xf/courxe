@@ -1,7 +1,7 @@
 from django.http import Http404, HttpResponse
 from django.shortcuts import render
 
-from src.helpers import get_cloudinary_video_object
+import helpers
 
 from .services import get_course_detail, get_course_lessons, get_lesson_detail, get_published_courses
 
@@ -38,7 +38,7 @@ def lesson_detail_view(request: HttpResponse, course_id=None, lesson_id=None, *a
         """ lesson in published, keep going """
         """video is available"""
         template = "courses/lesson.html"
-        video_embed_html = get_cloudinary_video_object(
+        video_embed_html = helpers.get_cloudinary_video_object(
             instance=lesson_obj,
             field_name="video",
             as_html=True,

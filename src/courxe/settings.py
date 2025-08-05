@@ -8,6 +8,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 CDN_DIR = BASE_DIR.parent / "cdn"
 TEMPLATES_DIR = BASE_DIR / "templates"
 
+BASE_URL = config("BASE_URL", default="http://127.0.0.1:8000")
+
+# email config
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" # django handles it by default
+EMAIL_HOST = config("EMAIL_HOST", cast=str, default=None)
+EMAIL_PORT = config("EMAIL_PORT", cast=str, default="587")
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", cast=str, default=None)
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", cast=str, default=None)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool, default=True)
+# EMAIL_USE_SSL = config("EMAIL_USE_SSL", cast=bool, default=False)
+
+ADMIN_USER_NAME = config("ADMIN_USER_NAME", default="rob")
+ADMIN_USER_EMAIL = config("ADMIN_USER_EMAIL", default=None)
+
+MANAGERS = []
+ADMINS = []
+if all([ADMIN_USER_NAME, ADMIN_USER_EMAIL]):
+    ADMINS += [
+        (f"{ADMIN_USER_NAME}", f"{ADMIN_USER_EMAIL}"),
+    ]
+    MANAGERS = ADMINS
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -32,6 +54,7 @@ INSTALLED_APPS = [
     # my apps
     "courses",
     "csp",
+    "emails",
 ]
 
 # cloudinary videos
