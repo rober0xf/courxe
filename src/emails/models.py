@@ -17,7 +17,7 @@ class EmailVerification(models.Model):
     parent = models.ForeignKey(Email, on_delete=models.SET_NULL, null=True)
     email = models.EmailField()
     token = models.UUIDField(default=uuid.uuid1)
-    attempts = models.IntegerField(default=0)
+    attempts: int = models.IntegerField(default=0)  # type:ignore
     expired = models.BooleanField(default=False)
     last_attempt_at = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
     expired_at = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
