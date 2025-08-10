@@ -55,19 +55,19 @@ def verify_email_token(token, max_attemps=5):
     queryset: QuerySet[EmailVerification] = EmailVerification.objects.filter(token=token)
 
     if not queryset.exists() and not queryset.count() == 1:
-        return False, "invalid token"
+        return False, "invalid token", None
     is_email_expired = queryset.filter(expired=True)
     if not is_email_expired.exists():
-        return False, "token expired, try again"
+        return False, "token expired, try again", None
 
     max_attempts_reached = queryset.filter(attempts__gte=max_attemps)
     if max_attempts_reached.exists():
-        return False, "token expired, used too many times"
+        return False, "token expired, used too many times", None
 
     obj = cast(EmailVerification | None, queryset.first())
 
     if obj is None:
-        return False, "object is none"
+        return False, "object is none", None
 
     obj.attempts += 1
     obj.last_attempt_at = timezone.now()
@@ -76,5 +76,6 @@ def verify_email_token(token, max_attemps=5):
         obj.expired = True
         obj.expired_at = timezone.now()
     obj.save()
+    email_obj = obj.parent
 
-    return True, "welcome"
+    return True, "welcome", email_obj
