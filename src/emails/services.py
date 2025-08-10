@@ -1,5 +1,9 @@
+from typing import cast
+
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db.models import QuerySet
+from django.utils import timezone
 
 from .models import Email, EmailVerification
 
@@ -45,3 +49,32 @@ def send_verification_email(obj_id):
         html_message=text_html,
     )
     return sent
+
+
+def verify_email_token(token, max_attemps=5):
+    queryset: QuerySet[EmailVerification] = EmailVerification.objects.filter(token=token)
+
+    if not queryset.exists() and not queryset.count() == 1:
+        return False, "invalid token"
+    is_email_expired = queryset.filter(expired=True)
+    if not is_email_expired.exists():
+        return False, "token expired, try again"
+
+    max_attempts_reached = queryset.filter(attempts__gte=max_attemps)
+    if max_attempts_reached.exists():
+        return False, "token expired, used too many times"
+
+    obj = cast(EmailVerification | None, queryset.first())
+
+    if obj is None:
+        return False, "object is none"
+
+    obj.attempts += 1
+    obj.last_attempt_at = timezone.now()
+
+    if obj.attempts > max_attemps:
+        obj.expired = True
+        obj.expired_at = timezone.now()
+    obj.save()
+
+    return True, "welcome"
