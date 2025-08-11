@@ -67,7 +67,7 @@ class Course(models.Model):
 
 
 class Lesson(models.Model):
-    related_course = models.ForeignKey(Course, on_delete=models.CASCADE)  # linking the lesson with a course
+    related_course: models.ForeignKey[Course] = models.ForeignKey("Course", on_delete=models.CASCADE)  # linking the lesson with a course
     title = models.CharField(max_length=20)
     description = models.TextField(blank=True, null=True)
     public_id = models.CharField(max_length=120, blank=True, null=True, db_index=True)  # slug
@@ -133,3 +133,7 @@ class Lesson(models.Model):
     @property
     def has_video(self):
         return self.video is not None
+
+    @property
+    def requires_email(self):
+        return self.related_course.access == AcessRequirements.EMAIL_REQUIRED
