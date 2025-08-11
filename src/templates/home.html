@@ -1,9 +1,5 @@
 {% extends "base.html" %}
 <h1>Hello</h1>
-{% block head_title %}
-Hello world from home page
-{% endblock head_title %}
-
-{% block content %}
-Hello body world from hom
+{% block head_title %} Courxe {% endblock head_title %} {% block content %}
+<div hx-get="/hx/login/" hx-trigger="load"></div>
 {% endblock content %}

@@ -1,29 +1,42 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cloudinary-video-player@3.0.2/dist/cld-video-player.min.css"
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-<script src="https://cdn.jsdelivr.net/npm/cloudinary-video-player@3.0.2/dist/cld-video-player.min.js"
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% load django_htmx %}
+
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/cloudinary-video-player@3.0.2/dist/cld-video-player.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+/>
+<script
+    src="https://cdn.jsdelivr.net/npm/cloudinary-video-player@3.0.2/dist/cld-video-player.min.js"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+></script>
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
+{% django_htmx_script %}
 
 <script defer>
     function renderVideoElement(videoPlayerElement) {
         // creates a random video id
-        const videoPlayerId = "video-id" + Math.random().toString(36).substr(2, 9)
-        videoPlayerElement.setAttribute("id", videoPlayerId)
-        const cloudName = videoPlayerElement.dataset.cloudName
-        const videoUrl = videoPlayerElement.dataset.videoUrl
+        const videoPlayerId =
+            "video-id" + Math.random().toString(36).substr(2, 9);
+        videoPlayerElement.setAttribute("id", videoPlayerId);
+        const cloudName = videoPlayerElement.dataset.cloudName;
+        const videoUrl = videoPlayerElement.dataset.videoUrl;
         if (cloudName && videoUrl) {
             const cld = cloudinary.videoPlayer(videoPlayerId, {
-                cloudName: cloudName
-            })
-            cld.source(videoUrl)
+                cloudName: cloudName,
+            });
+            cld.source(videoUrl);
         }
     }
 
     function renderAllVideos(params) {
-        const videoPlayerClassName = "videos"
-        const videoPlayerElements = document.getElementsByClassName(videoPlayerClassName)
+        const videoPlayerClassName = "videos";
+        const videoPlayerElements =
+            document.getElementsByClassName(videoPlayerClassName);
         for (let video of videoPlayerElements) {
-            renderVideoElement(video)
+            renderVideoElement(video);
         }
     }
-    document.addEventListener("DOMContentLoaded", renderAllVideos)
+    document.addEventListener("DOMContentLoaded", renderAllVideos);
 </script>
