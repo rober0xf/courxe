@@ -1,0 +1,10 @@
+{% if show_form %} {% if messasge != "" %} {{message}} {% else %}
+
+<form hx-post="/hx/login" method="post" action=".">
+    {% csrf_token %}
+    <button type="submit">Submit</button>
+</form>
+
+{% endif %} {% else %}
+<div hx-get="/hx/logout/" hx-trigger="revealed"></div>
+{% endif %}
