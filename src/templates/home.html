@@ -1,15 +1,5 @@
 {% extends "base.html" %}
 <h1>Hello</h1>
-{% block head_title %}
-Courxe
-{% endblock head_title %}
-
-{% block content %}
-<div>
-    <form method="post" action=".">
-        {% csrf_token %}
-        {{ form }}
-        <button type="submit">Login</button>
-    </form>
-</div>
+{% block head_title %} Courxe {% endblock head_title %} {% block content %}
+<div hx-get="/hx/login/" hx-trigger="load"></div>
 {% endblock content %}
